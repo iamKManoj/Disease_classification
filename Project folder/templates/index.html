@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Disease Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            /* background-color: #f5f7fa; */
+            background: linear-gradient(135deg, #00796b, #4db6ac);
+            padding: 20px;
+            color: white;
+        }
+        
+        /* .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgb(143, 139, 139);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        } */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgb(255, 255, 255), #d0eeea); 
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            color: white;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .description {
+            color: #4a5568;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .symptom-group {
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .group-title {
+            padding: 15px;
+            background-color: #edf2f7;
+            color: #2d3748;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.3s ease;
+        }
+        
+        .group-title:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .group-content {
+            display: none;
+            padding: 15px;
+            background-color: #f8fafc;
+        }
+        
+        .group-content.active {
+            display: block;
+        }
+        
+        .symptoms-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .symptom-label {
+            position: relative;
+            flex: 1 0 auto;
+            min-width: 150px;
+            max-width: calc(50% - 12px);
+        }
+        
+        .symptom-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .symptom-text {
+            display: block;
+            padding: 12px 15px;
+            background-color: #edf2f7;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #4a5568;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .symptom-checkbox:checked + .symptom-text {
+            background-color: #4299e1;
+            border-color: #3182ce;
+            color: white;
+        }
+        
+        .symptom-checkbox:focus + .symptom-text {
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+        }
+        
+        .symptom-checkbox + .symptom-text:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .symptom-checkbox:checked + .symptom-text:hover {
+            background-color: #3182ce;
+        }
+        
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .submit-btn:hover {
+            background-color: #49f1e1;
+        }
+        
+        .result-container {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f0f9ff;
+            border-radius: 8px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .result-heading {
+            color: #0369a1;
+            margin-bottom: 10px;
+        }
+        
+        .result-prediction {
+            font-size: 22px;
+            font-weight: 600;
+            color: #0c4a6e;
+        }
+        
+        .selected-symptoms {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        
+        .selected-symptoms-title {
+            margin-bottom: 10px;
+            color: #2d3748;
+            font-size: 18px;
+        }
+        h1 {
+            text-align: center;
+            color: #00796b;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .icon-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .icon-header i {
+            font-size: 48px;
+            color: #00796b;
+        }
+        
+        @media (max-width: 600px) {
+            .symptom-label {
+                min-width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon-header">
+            <i class="fas fa-hospital"></i>
+        </div>
+        <h1>Disease Classification</h1>
+        <p class="description">Select Patient Symptoms</p>
+        
+        <form method="POST">
+            <!-- Pain Symptoms Group -->
+            <div class="symptom-group">
+                <button type="button" class="group-title" onclick="this.nextElementSibling.classList.toggle('active')">Pain Symptoms</button>
+                <div class="group-content">
+                    <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="low back pain"> <span class="symptom-text">Low back pain</span> </label>
+                    <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="ear pain"> <span class="symptom-text">Ear pain</span> </label>
+                    <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="ankle pain"> <span class="symptom-text">Ankle pain</span> </label>
+                    <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="rib pain"> <span class="symptom-text">Rib pain</span> </label>
+                    <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="upper abdominal pain"> <span class="symptom-text">Upper abdominal pain</span> </label>
+                    <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="pain during pregnancy"> <span class="symptom-text">Pain during pregnancy</span> </label>
+                    <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="painful urination"> <span class="symptom-text">Painful urination</span> </label>
+                    <div class="symptoms-container">
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="headache">
+                            <span class="symptom-text">Headache</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="burning abdominal pain">
+                            <span class="symptom-text">Burning abdominal pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="pelvic pain">
+                            <span class="symptom-text">Pelvic pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="back pain">
+                            <span class="symptom-text">Back pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="ache all over">
+                            <span class="symptom-text">Ache all over</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="sharp abdominal pain">
+                            <span class="symptom-text">Sharp abdominal pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="sharp chest pain">
+                            <span class="symptom-text">Sharp chest pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="joint pain">
+                            <span class="symptom-text">Joint pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="knee pain">
+                            <span class="symptom-text">Knee pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="foot or toe pain">
+                            <span class="symptom-text">Foot or toe pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="lower body pain">
+                            <span class="symptom-text">Lower body pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="neck pain">
+                            <span class="symptom-text">Neck pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="suprapubic pain">
+                            <span class="symptom-text">Suprapubic pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="hand or finger pain">
+                            <span class="symptom-text">Hand or finger pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="shoulder pain">
+                            <span class="symptom-text">Shoulder pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="leg pain">
+                            <span class="symptom-text">Leg pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="side pain">
+                            <span class="symptom-text">Side pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="arm pain">
+                            <span class="symptom-text">Arm pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="hip pain">
+                            <span class="symptom-text">Hip pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="vaginal pain">
+                            <span class="symptom-text">Vaginal pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="wrist pain">
+                            <span class="symptom-text">Wrist pain</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="lower abdominal pain">
+                            <span class="symptom-text">Lower abdominal pain</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Digestive Symptoms Group -->
+            <div class="symptom-group">
+                <button type="button" class="group-title" onclick="this.nextElementSibling.classList.toggle('active')">Digestive Symptoms</button>
+                <div class="group-content">
+                    <div class="symptoms-container">
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="regurgitation.1"> <span class="symptom-text">Regurgitation</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="jaundice"> <span class="symptom-text">Jaundice</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="blood in stool"> <span class="symptom-text">Blood in stool</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="melena"> <span class="symptom-text">Melena (dark, tarry stool)</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="heartburn"> <span class="symptom-text">Heartburn</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="mouth dryness"> <span class="symptom-text">Mouth dryness</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="infant feeding problem"> <span class="symptom-text">Infant feeding problem</span> </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="nausea">
+                            <span class="symptom-text">Nausea</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="vomiting">
+                            <span class="symptom-text">Vomiting</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="decreased appetite">
+                            <span class="symptom-text">Decreased appetite</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="vomiting blood">
+                            <span class="symptom-text">Vomiting blood</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="rectal bleeding">
+                            <span class="symptom-text">Rectal bleeding</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="diarrhea">
+                            <span class="symptom-text">Diarrhea</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="constipation">
+                            <span class="symptom-text">Constipation</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="difficulty in swallowing">
+                            <span class="symptom-text">Difficulty in swallowing</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Neurological and Movement Symptoms Group -->
+            <div class="symptom-group">
+                <button type="button" class="group-title" onclick="this.nextElementSibling.classList.toggle('active')">Neurological & Movement Symptoms</button>
+                <div class="group-content">
+                    <div class="symptoms-container">
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="paresthesia"> <span class="symptom-text">Paresthesia (tingling/numbness)</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="dizziness"> <span class="symptom-text">Dizziness</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="fainting"> <span class="symptom-text">Fainting</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="leg weakness"> <span class="symptom-text">Leg weakness</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="temper problems"> <span class="symptom-text">Temper problems</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="low self-esteem"> <span class="symptom-text">Low self-esteem</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="insomnia"> <span class="symptom-text">Insomnia</span> </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="problems with movement">
+                            <span class="symptom-text">Problems with movement</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="disturbance of memory">
+                            <span class="symptom-text">Disturbance of memory</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="weakness">
+                            <span class="symptom-text">Weakness</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="abnormal involuntary movements">
+                            <span class="symptom-text">Abnormal involuntary movements</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="loss of sensation">
+                            <span class="symptom-text">Loss of sensation</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="difficulty speaking">
+                            <span class="symptom-text">Difficulty speaking</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="arm weakness">
+                            <span class="symptom-text">Arm weakness</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="hip stiffness or tightness">
+                            <span class="symptom-text">Hip stiffness or tightness</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="restlessness">
+                            <span class="symptom-text">Restlessness</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Respiratory Symptoms Group -->
+            <div class="symptom-group">
+                <button type="button" class="group-title" onclick="this.nextElementSibling.classList.toggle('active')">Respiratory Symptoms</button>
+                <div class="group-content">
+                    <div class="symptoms-container">
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="cough"> <span class="symptom-text">Cough</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="congestion in chest"> <span class="symptom-text">Congestion in chest</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="shortness of breath"> <span class="symptom-text">Shortness of breath</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="hurts to breath"> <span class="symptom-text">Hurts to breath</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="wheezing"> <span class="symptom-text">Wheezing</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="sore throat"> <span class="symptom-text">Sore throat</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="difficulty breathing"> <span class="symptom-text">Difficulty breathing</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="nosebleed"> <span class="symptom-text">Nosebleed</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="chest tightness"> <span class="symptom-text">Chest tightness</span> </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="chest tightness">
+                            <span class="symptom-text">Chest tightness</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="breathing fast">
+                            <span class="symptom-text">Breathing fast</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="hoarse voice">
+                            <span class="symptom-text">Hoarse voice</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="hemoptysis">
+                            <span class="symptom-text">Hemoptysis (Coughing blood)</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="coughing up sputum">
+                            <span class="symptom-text">Coughing up sputum</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Heart and Circulation Symptoms Group -->
+            <div class="symptom-group">
+                <button type="button" class="group-title" onclick="this.nextElementSibling.classList.toggle('active')">Heart & Circulation Symptoms</button>
+                <div class="group-content">
+                    <div class="symptoms-container">
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="irregular heartbeat"> <span class="symptom-text">Irregular heartbeat</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="peripheral edema"> <span class="symptom-text">Peripheral edema</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="palpitations"> <span class="symptom-text">Palpitations</span> </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="fluid retention">
+                            <span class="symptom-text">Fluid retention</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- General and Other Symptoms Group -->
+            <div class="symptom-group">
+                <button type="button" class="group-title" onclick="this.nextElementSibling.classList.toggle('active')">Skin & General Symptoms</button>
+                <div class="group-content">
+                    <div class="symptoms-container">
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="feeling ill"> <span class="symptom-text">Feeling ill</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="irritable infant"> <span class="symptom-text">Irritable infant</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="skin moles"> <span class="symptom-text">Skin moles</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="skin irritation"> <span class="symptom-text">Skin irritation</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="itchy scalp"> <span class="symptom-text">Itchy scalp</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="skin growth"> <span class="symptom-text">Skin growth</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="acne or pimples"> <span class="symptom-text">Acne or pimples</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="wrist swelling"> <span class="symptom-text">Wrist swelling</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="knee swelling"> <span class="symptom-text">Knee swelling</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="elbow swelling"> <span class="symptom-text">Elbow swelling</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="hand or finger swelling"> <span class="symptom-text">Hand or finger swelling</span> </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="fever">
+                            <span class="symptom-text">Fever</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="chills">
+                            <span class="symptom-text">Chills</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="depression">
+                            <span class="symptom-text">Depression</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="depressive or psychotic symptoms">
+                            <span class="symptom-text">Depressive or psychotic symptoms</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="abusing alcohol">
+                            <span class="symptom-text">Abusing alcohol</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="flu-like syndrome">
+                            <span class="symptom-text">Flu-like syndrome</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="skin rash">
+                            <span class="symptom-text">Skin rash</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="warts">
+                            <span class="symptom-text">Warts</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reproductive Symptoms Group -->
+            <div class="symptom-group">
+                <button type="button" class="group-title" onclick="this.nextElementSibling.classList.toggle('active')">Urinary & Reproductive Symptoms</button>
+                <div class="group-content">
+                    <div class="symptoms-container">
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="symptoms of the kidneys"> <span class="symptom-text">Symptoms of the kidneys</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="intermenstrual bleeding"> <span class="symptom-text">Intermenstrual bleeding</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="problems during pregnancy"> <span class="symptom-text">Problems during pregnancy</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="retention of urine"> <span class="symptom-text">Retention of urine</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="symptoms of bladder"> <span class="symptom-text">Symptoms of bladder</span> </label>
+                        <label class="symptom-label"> <input type="checkbox" class="symptom-checkbox" name="symptoms" value="unusual color or odor to urine"> <span class="symptom-text">Unusual color or odor to urine</span> </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="vaginal discharge">
+                            <span class="symptom-text">Vaginal discharge</span>
+                        </label>
+                        <label class="symptom-label">
+                            <input type="checkbox" class="symptom-checkbox" name="symptoms" value="uterine contractions">
+                            <span class="symptom-text">Uterine contractions</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn">Predict Disease</button>
+        </form>
+        
+        {% if prediction %}
+        <div class="result-container">
+            <h1 class="result-heading">Predicted Top 2 Potential Diseases:</h1>
+            <p class="result-prediction">{{ prediction | safe }}</p>
+        </div>
+        {% endif %}
+        <form method="GET", action='/details'>
+            <button type="submit" class="submit-btn" onsubmit="this.submit.disabled = true;">Next Patient</button>
+        </form>
+
+        <form method="GET", action='/logout'>
+            <button type="submit" class="submit-btn" onsubmit="this.submit.disabled = true;">log out</button>
+
+        </form>
+    </div>
+
+
+</body>
+</html>

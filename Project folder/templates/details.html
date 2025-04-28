@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #00796b, #4db6ac);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .data-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.3s ease;
+        }
+
+        .data-container:hover {
+            transform: translateY(-1px);
+        }
+        .icon-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .icon-header i {
+            font-size: 48px;
+            color: #00796b;
+        }
+
+        h2 {
+            text-align: center;
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        button {
+            width: 50%;
+            padding: 12px;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo i {
+            font-size: 48px;
+            color: #00796b;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        option {
+            font-size: 16px;
+        }
+
+        #gender {
+            color: #00796b;
+        }
+    </style>
+</head>
+<body>
+    <div class="data-container">
+        <div class="logo">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <h2>Patient Details</h2>
+        <form method="POST" action="/details">
+            <input type="text" name="patient_name" placeholder="Name" required>
+            <div class="button-container">
+                <!-- <label for="gender">Gender</label> -->
+                <select id="gender" name="gender" required>
+                    <option value="" disabled selected>Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <input type="text" name="patient_id" placeholder="Patient ID" required>
+            <input type="text" name="age" placeholder="Age" required>
+            <input type="text" name="blood_group" placeholder="Blood Group" required>
+            <input type="text" name="city" placeholder="City" required>
+            <input type="text" name="contact" placeholder="Contact" required>
+            <div class="button-container">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

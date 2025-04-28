@@ -1,0 +1,9 @@
+libraries needed: 
+
+pip install pymysql
+pip install sqlalchemy
+
+
+
+open your xampp and create a new DB and name it patient_db
+you should run your xampp before running the app.py file
